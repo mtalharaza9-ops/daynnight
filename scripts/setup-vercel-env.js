@@ -82,17 +82,21 @@ function readEnvFile() {
   return envVars;
 }
 
-function setVercelEnvVar(key, value, environment = 'production,preview,development') {
-  try {
-    log(`Setting ${key} for ${environment}...`, 'yellow');
-    execSync(`vercel env add ${key} ${environment}`, {
-      input: value,
-      stdio: ['pipe', 'pipe', 'pipe']
-    });
-    log(`✅ Set ${key}`, 'green');
-  } catch (error) {
-    log(`❌ Failed to set ${key}: ${error.message}`, 'red');
-  }
+function setVercelEnvVar(key, value) {
+  const environments = ['production', 'preview', 'development'];
+  
+  environments.forEach(env => {
+    try {
+      log(`Setting ${key} for ${env}...`, 'yellow');
+      execSync(`vercel env add ${key} ${env}`, {
+        input: value,
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+      log(`✅ Set ${key} for ${env}`, 'green');
+    } catch (error) {
+      log(`❌ Failed to set ${key} for ${env}: ${error.message}`, 'red');
+    }
+  });
 }
 
 function generateNextAuthSecret() {
