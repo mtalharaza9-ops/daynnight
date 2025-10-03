@@ -5,8 +5,23 @@
     }
   },
   "regions": ["iad1"],
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
   "env": {
     "NEXTAUTH_SECRET": "@nextauth_secret",
-    "NEXTAUTH_URL": "@nextauth_url"
+    "NEXTAUTH_URL": "@nextauth_url",
+    "POSTGRES_URL": "@postgres_url",
+    "POSTGRES_PRISMA_URL": "@postgres_prisma_url",
+    "POSTGRES_URL_NON_POOLING": "@postgres_url_non_pooling",
+    "POSTGRES_USER": "@postgres_user",
+    "POSTGRES_HOST": "@postgres_host",
+    "POSTGRES_PASSWORD": "@postgres_password",
+    "POSTGRES_DATABASE": "@postgres_database"
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
   }
 }
