@@ -2,17 +2,68 @@
 
 ## 🚀 Quick Deploy to Vercel
 
-### Option 1: One-Click Deploy
+### Option 1: Automated Setup (Recommended)
+```bash
+# Install Vercel CLI globally
+npm i -g vercel
+
+# Login to Vercel
+vercel login
+
+# Link your project
+vercel link
+
+# Automatically set up environment variables
+npm run setup-vercel
+
+# Deploy
+vercel --prod
+```
+
+### Option 2: One-Click Deploy
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/mtalharaza9-ops/daynnight)
 
-### Option 2: Manual Setup
+### Option 3: Manual Setup
 
 ## 📋 Prerequisites
 - Vercel account
 - GitHub repository connected
 - PostgreSQL database (Vercel Postgres or external)
+- `.env.local` file with your environment variables
 
-## 🔧 Environment Variables Setup
+## 🔧 Automated Environment Variables Setup
+
+We've created an automated script that reads your `.env.local` file and sets up all environment variables in Vercel automatically!
+
+### Steps:
+1. **Install Vercel CLI** (if not already installed):
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Login to Vercel**:
+   ```bash
+   vercel login
+   ```
+
+3. **Link your project**:
+   ```bash
+   vercel link
+   ```
+
+4. **Run the automated setup**:
+   ```bash
+   npm run setup-vercel
+   ```
+
+The script will:
+- ✅ Read your `.env.local` file
+- ✅ Generate `NEXTAUTH_SECRET` if missing
+- ✅ Auto-detect `NEXTAUTH_URL` from your Vercel project
+- ✅ Set all environment variables for Production, Preview, and Development
+- ✅ Provide a summary of what was configured
+
+## 🔧 Manual Environment Variables Setup
 
 **IMPORTANT**: Set these environment variables directly in your Vercel dashboard, NOT as secrets.
 
@@ -54,7 +105,8 @@ NEXTAUTH_URL=https://your-app-name.vercel.app
 1. Go to your Vercel dashboard
 2. Navigate to Storage tab
 3. Create a new Postgres database
-4. Copy the connection strings to your environment variables
+4. Copy the connection strings to your `.env.local` file
+5. Run `npm run setup-vercel` to automatically configure Vercel
 
 ### Option B: External Database
 Use any PostgreSQL provider (Supabase, Railway, PlanetScale, etc.)
@@ -67,8 +119,8 @@ Use any PostgreSQL provider (Supabase, Railway, PlanetScale, etc.)
    - Import from GitHub: `mtalharaza9-ops/daynnight`
 
 2. **Set Environment Variables**
-   - During import, or later in Project Settings
-   - Add ALL variables listed above
+   - **Automated**: Run `npm run setup-vercel`
+   - **Manual**: Add variables in Project Settings
    - Set for Production, Preview, and Development environments
 
 3. **Deploy**
@@ -128,6 +180,12 @@ The `vercel.json` file is configured with:
 - Test connection strings locally first
 - Check database firewall settings
 - Verify SSL requirements
+
+### Script Issues
+- **Vercel CLI not found**: Install with `npm i -g vercel`
+- **Not logged in**: Run `vercel login`
+- **Project not linked**: Run `vercel link`
+- **Missing .env.local**: Create the file with your environment variables
 
 ## 📊 Monitoring
 
