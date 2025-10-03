@@ -14,7 +14,9 @@
 
 ## 🔧 Environment Variables Setup
 
-In your Vercel dashboard, add these environment variables:
+**IMPORTANT**: Set these environment variables directly in your Vercel dashboard, NOT as secrets.
+
+In your Vercel dashboard → Project → Settings → Environment Variables, add:
 
 ### Database Configuration
 ```
@@ -33,6 +35,19 @@ NEXTAUTH_SECRET=your-super-secret-key-here-minimum-32-characters
 NEXTAUTH_URL=https://your-app-name.vercel.app
 ```
 
+## ⚠️ Important Notes
+
+1. **Environment Variables vs Secrets**: 
+   - Use regular environment variables, NOT Vercel secrets (@secret_name)
+   - Set values directly in the Vercel dashboard
+   - Make sure to set for all environments (Production, Preview, Development)
+
+2. **NEXTAUTH_SECRET Generation**:
+   ```bash
+   # Generate a secure secret
+   openssl rand -base64 32
+   ```
+
 ## 🗄️ Database Setup Options
 
 ### Option A: Vercel Postgres (Recommended)
@@ -47,34 +62,36 @@ Use any PostgreSQL provider (Supabase, Railway, PlanetScale, etc.)
 ## 🔄 Deployment Steps
 
 1. **Connect Repository**
-   ```bash
-   # If not already connected, link your repo
-   vercel --prod
-   ```
+   - Go to [vercel.com](https://vercel.com)
+   - Click "New Project"
+   - Import from GitHub: `mtalharaza9-ops/daynnight`
 
 2. **Set Environment Variables**
-   - Go to Vercel Dashboard → Project → Settings → Environment Variables
-   - Add all the variables listed above
+   - During import, or later in Project Settings
+   - Add ALL variables listed above
+   - Set for Production, Preview, and Development environments
 
 3. **Deploy**
-   - Push to main branch triggers automatic deployment
-   - Or manually deploy: `vercel --prod`
+   - Click "Deploy" 
+   - Vercel will automatically build and deploy
+   - Future pushes to main branch trigger auto-deployment
 
 ## 🛠️ Build Configuration
 
-The `vercel.json` file is already configured with:
+The `vercel.json` file is configured with:
 - ✅ Next.js framework detection
 - ✅ Build command: `npm run build`
 - ✅ Output directory: `.next`
 - ✅ API function timeout: 30 seconds
-- ✅ Environment variable references
 - ✅ Auto-deployment from main branch
+- ✅ No secret references (uses direct env vars)
 
 ## 🔍 Post-Deployment Checklist
 
 1. **Verify Environment Variables**
-   - Check Vercel dashboard for all required env vars
-   - Ensure NEXTAUTH_URL matches your domain
+   - Check Vercel dashboard → Settings → Environment Variables
+   - Ensure all required variables are set
+   - Verify NEXTAUTH_URL matches your Vercel domain
 
 2. **Test Authentication**
    - Visit `/auth/signin`
@@ -92,14 +109,19 @@ The `vercel.json` file is already configured with:
 
 ## 🚨 Troubleshooting
 
+### Environment Variable Errors
+- **"Secret does not exist"**: Use direct values, not @secret_name format
+- **Missing variables**: Ensure all variables are set in Vercel dashboard
+- **Wrong environment**: Set variables for Production, Preview, and Development
+
 ### Build Failures
 - Check build logs in Vercel dashboard
-- Ensure all environment variables are set
+- Ensure all environment variables are set correctly
 - Verify database connection strings
 
 ### Authentication Issues
-- Verify NEXTAUTH_SECRET is set (32+ characters)
-- Check NEXTAUTH_URL matches your domain
+- Generate NEXTAUTH_SECRET: `openssl rand -base64 32`
+- Check NEXTAUTH_URL matches your domain exactly
 - Ensure it starts with https:// in production
 
 ### Database Connection Errors
@@ -118,12 +140,13 @@ The `vercel.json` file is already configured with:
 - [Vercel Documentation](https://vercel.com/docs)
 - [Next.js Deployment](https://nextjs.org/docs/deployment)
 - [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres)
+- [Environment Variables Guide](https://vercel.com/docs/concepts/projects/environment-variables)
 
 ## 🎯 Production Optimization
 
 1. **Environment Variables**
-   - Use Vercel's environment variable encryption
-   - Set different values for preview/production
+   - Set different values for preview/production environments
+   - Use Vercel's built-in environment variable management
 
 2. **Database**
    - Enable connection pooling
