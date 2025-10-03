@@ -1,0 +1,45 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Create .env.local for build
+      run: |
+        echo "POSTGRES_URL=postgres://user:pass@localhost:5432/testdb" >> .env.local
+        echo "POSTGRES_PRISMA_URL=postgres://user:pass@localhost:5432/testdb" >> .env.local
+        echo "POSTGRES_URL_NON_POOLING=postgres://user:pass@localhost:5432/testdb" >> .env.local
+        echo "POSTGRES_USER=user" >> .env.local
+        echo "POSTGRES_HOST=localhost" >> .env.local
+        echo "POSTGRES_PASSWORD=pass" >> .env.local
+        echo "POSTGRES_DATABASE=testdb" >> .env.local
+        echo "NEXTAUTH_SECRET=test-secret-for-build-only" >> .env.local
+        echo "NEXTAUTH_URL=http://localhost:3000" >> .env.local
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Build application
+      run: npm run build
+
+    - name: Type check
+      run: npx tsc --noEmit
