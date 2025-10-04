@@ -36,21 +36,24 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-6">
             <Link href="/" className="text-gray-700 hover:text-gray-900">
               Home
             </Link>
-            <Link href="/products" className="text-gray-700 hover:text-gray-900">
-              Products
-            </Link>
             <Link href="/categories" className="text-gray-700 hover:text-gray-900">
-              Categories
+              Shop by Category
             </Link>
-            <Link href="/about" className="text-gray-700 hover:text-gray-900">
-              About
+            <Link href="/best-sellers" className="text-gray-700 hover:text-gray-900">
+              Best Sellers
+            </Link>
+            <Link href="/new-arrivals" className="text-gray-700 hover:text-gray-900">
+              New Arrivals
+            </Link>
+            <Link href="/deals" className="text-gray-700 hover:text-gray-900">
+              Deals of the Day
             </Link>
             <Link href="/contact" className="text-gray-700 hover:text-gray-900">
-              Contact
+              Contact Us
             </Link>
           </nav>
 
@@ -94,7 +97,7 @@ export default function Header() {
                   href="/auth/signin"
                   className="text-gray-700 hover:text-gray-900"
                 >
-                  Sign In
+                  👤 Sign In
                 </Link>
                 <Link
                   href="/auth/signup"
@@ -104,6 +107,9 @@ export default function Header() {
                 </Link>
               </div>
             )}
+            <button className="text-gray-700 hover:text-gray-900">
+              ❤️ <span className="ml-1">Wishlist</span>
+            </button>
             <button className="text-gray-700 hover:text-gray-900">
               🛒 <span className="ml-1">Cart (0)</span>
             </button>
@@ -136,17 +142,20 @@ export default function Header() {
                 <Link href="/" className="text-gray-700 hover:text-gray-900 py-2">
                   Home
                 </Link>
-                <Link href="/products" className="text-gray-700 hover:text-gray-900 py-2">
-                  Products
-                </Link>
                 <Link href="/categories" className="text-gray-700 hover:text-gray-900 py-2">
-                  Categories
+                  Shop by Category
                 </Link>
-                <Link href="/about" className="text-gray-700 hover:text-gray-900 py-2">
-                  About
+                <Link href="/best-sellers" className="text-gray-700 hover:text-gray-900 py-2">
+                  Best Sellers
+                </Link>
+                <Link href="/new-arrivals" className="text-gray-700 hover:text-gray-900 py-2">
+                  New Arrivals
+                </Link>
+                <Link href="/deals" className="text-gray-700 hover:text-gray-900 py-2">
+                  Deals of the Day
                 </Link>
                 <Link href="/contact" className="text-gray-700 hover:text-gray-900 py-2">
-                  Contact
+                  Contact Us
                 </Link>
               </nav>
             </div>

@@ -6,35 +6,39 @@ import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 const slides = [
   {
     id: 1,
-    title: 'Welcome to Day & Night Inc.',
-    subtitle: 'Your Premier E-commerce Destination',
-    description: 'Discover amazing products at unbeatable prices. Shop with confidence 24/7.',
+    title: 'Fall Sale - Up to 40% OFF',
+    subtitle: 'Seasonal Promotions at Day & Night Inc.',
+    description: 'Discover amazing deals on your favorite products. Free shipping on orders over $50!',
     image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&h=600&fit=crop',
     cta: 'Shop Now',
+    badge: 'Free Shipping',
   },
   {
     id: 2,
+    title: 'Best-Selling Categories',
+    subtitle: 'Home Essentials & Daily Needs',
+    description: 'From groceries to household items - everything you need for daily life.',
+    image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&h=600&fit=crop',
+    cta: 'Explore Categories',
+    badge: '100% Original',
+  },
+  {
+    id: 3,
     title: 'Electronics & Gadgets',
     subtitle: 'Latest Technology at Your Fingertips',
     description: 'From smartphones to smart home devices, find the latest tech innovations.',
     image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&h=600&fit=crop',
-    cta: 'Explore Electronics',
-  },
-  {
-    id: 3,
-    title: 'Fashion & Style',
-    subtitle: 'Express Your Unique Style',
-    description: 'Trendy clothing and accessories for every occasion and season.',
-    image: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=1200&h=600&fit=crop',
-    cta: 'Browse Fashion',
+    cta: 'Shop Electronics',
+    badge: '24/7 Support',
   },
   {
     id: 4,
-    title: 'Home & Garden',
-    subtitle: 'Transform Your Living Space',
-    description: 'Beautiful home decor and garden essentials to create your perfect space.',
+    title: 'Easy Returns Policy',
+    subtitle: 'Shop with Complete Confidence',
+    description: 'Not satisfied? Return within 30 days for a full refund. No questions asked.',
     image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop',
-    cta: 'Shop Home',
+    cta: 'Learn More',
+    badge: 'Easy Returns',
   },
 ];
 
@@ -91,6 +95,10 @@ export default function Hero() {
             {/* Content */}
             <div className="relative h-full flex items-center justify-center text-center text-white px-4">
               <div className="max-w-4xl mx-auto">
+                {/* Badge */}
+                <div className="inline-block bg-red-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                  {slide.badge}
+                </div>
                 <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in">
                   {slide.title}
                 </h1>
