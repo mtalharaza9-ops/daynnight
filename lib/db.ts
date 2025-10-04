@@ -8,7 +8,7 @@ function checkPostgresConnection() {
 }
 
 // Initialize memory data for development
-function initializeMemoryData() {
+async function initializeMemoryData() {
   memoryProducts = [
     {
       id: 1,
@@ -65,6 +65,19 @@ function initializeMemoryData() {
       image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400'
     }
   ];
+
+  // Create default admin user for development
+  const adminPassword = await bcrypt.hash('admin123', 10);
+  memoryUsers = [
+    {
+      id: 1,
+      email: 'admin@daynnight.com',
+      name: 'Admin User',
+      password: adminPassword,
+      role: 'admin',
+      createdAt: new Date()
+    }
+  ];
 }
 
 // For development, we'll use a simple in-memory fallback when Postgres is not available
@@ -78,7 +91,7 @@ let memoryCartItems: CartItem[] = [];
 
 // Initialize memory data immediately if Postgres is not available
 if (!isPostgresAvailable) {
-  initializeMemoryData();
+  initializeMemoryData().catch(console.error);
 }
 
 export interface Product {
@@ -440,8 +453,23 @@ export async function getUserByEmail(email: string) {
     `;
     return { success: true, data: rows[0] || null };
   } catch (error) {
-    console.error('Error fetching user by email:', error);
-    return { success: false, error };
+    console.error('Error fetching user by email, falling back to memory:', error);
+    // Fallback to in-memory storage
+    const user = memoryUsers.find(u => u.email === email);
+    if (user) {
+      return { 
+        success: true, 
+        data: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          password: user.password,
+          role: user.role,
+          created_at: user.createdAt
+        }
+      };
+    }
+    return { success: true, data: null };
   }
 }
 
