@@ -158,52 +158,59 @@ export default function Footer() {
               <h4 className="text-sm font-semibold mb-4">We Accept</h4>
               <div className="flex flex-wrap justify-center lg:justify-start items-center space-x-4">
                 {/* Visa */}
-                <div className="bg-white rounded p-2 flex items-center justify-center w-12 h-8">
-                  <svg viewBox="0 0 40 24" className="w-8 h-5">
-                    <path fill="#1434CB" d="M16.283 12.853l1.313-8.1h2.096l-1.313 8.1h-2.096zm10.493-7.895c-.417-.156-1.073-.323-1.896-.323-2.096 0-3.573 1.094-3.583 2.656-.01.938.854 1.459 1.51 1.771.677.323 1.073.531 1.073.823-.01.448-.552.646-1.063.646-.708 0-1.083-.104-1.667-.354l-.229-.104-.25 1.5c.5.229 1.417.427 2.375.438 2.229 0 3.677-1.083 3.688-2.76.01-.74-.448-1.302-1.438-1.771-.594-.302-.958-.5-.958-.802 0-.271.313-.563.979-.563.563-.01 1.073.115 1.427.25l.167.083.25-1.51zm4.073 5.22c.177-.469.854-2.281.854-2.281-.01.021.177-.469.281-.771l.146.708s.406 1.906.49 2.302h-1.771v.042zm2.458-5.205h-1.615c-.5 0-.875.146-1.094.677l-3.104 7.26h2.229s.365-.99.448-1.208h2.729c.063.281.26 1.208.26 1.208h1.969l-1.823-7.937h.001zm-15.593 0l-2.073 5.406-.219-1.094c-.385-1.281-1.583-2.667-2.927-3.365l1.875 6.99h2.25l3.344-8.1-2.25.163z"/>
-                    <path fill="#FFD700" d="M6.647 4.753H2.917l-.031.188c2.656.677 4.417 2.313 5.146 4.281l-.74-3.76c-.125-.5-.49-.677-.979-.709z"/>
+                <div className="bg-white rounded p-2 flex items-center justify-center w-16 h-10 shadow-sm">
+                  <svg viewBox="0 0 48 32" className="w-10 h-6">
+                    <rect width="48" height="32" rx="4" fill="#1A1F71"/>
+                    <path fill="#FFFFFF" d="M18.5 10.5h3.2l-2 11h-3.2l2-11zm8.8 0c-.6 0-1.1.3-1.4.8l-4.8 10.2h3.4l.7-1.9h4.2l.4 1.9h3l-2.6-11h-2.9zm.5 3.2l1 4.8h-2.7l1.7-4.8zm-8.5-3.2c-1.1 0-2.1.6-2.1 1.5 0 .8.7 1.2 1.2 1.5.5.3.7.5.7.8 0 .5-.6.7-1.1.7-.7 0-1.1-.1-1.7-.4l-.3 1.4c.4.2 1.1.3 1.8.3 1.2 0 2-.6 2-1.6 0-.6-.4-1.1-.9-1.4-.5-.3-.8-.5-.8-.8 0-.4.4-.6.9-.6.5 0 .9.1 1.3.2l.2-1.4c-.4-.1-.9-.2-1.4-.2z"/>
+                    <path fill="#FFD700" d="M8 10.5l-.1.6c1.4.3 2.7 1.1 3.5 2.1l-.5-2.4c-.1-.3-.3-.4-.6-.4H8z"/>
                   </svg>
                 </div>
 
                 {/* Mastercard */}
-                <div className="bg-white rounded p-2 flex items-center justify-center w-12 h-8">
-                  <svg viewBox="0 0 40 24" className="w-8 h-5">
-                    <circle fill="#FF5F00" cx="15" cy="12" r="7"/>
-                    <circle fill="#EB001B" cx="9" cy="12" r="7"/>
-                    <circle fill="#F79E1B" cx="21" cy="12" r="7"/>
+                <div className="bg-white rounded p-2 flex items-center justify-center w-16 h-10 shadow-sm">
+                  <svg viewBox="0 0 48 32" className="w-10 h-6">
+                    <rect width="48" height="32" rx="4" fill="#000000"/>
+                    <circle cx="18" cy="16" r="10" fill="#EB001B"/>
+                    <circle cx="30" cy="16" r="10" fill="#F79E1B"/>
+                    <circle cx="24" cy="16" r="10" fill="#FF5F00"/>
+                    <path fill="#FFFFFF" d="M22 8.5c-1.8 1.4-3 3.6-3 6.1s1.2 4.7 3 6.1c1.8-1.4 3-3.6 3-6.1s-1.2-4.7-3-6.1z"/>
                   </svg>
                 </div>
 
                 {/* PayPal */}
-                <div className="bg-white rounded p-2 flex items-center justify-center w-12 h-8">
-                  <svg viewBox="0 0 40 24" className="w-8 h-5">
-                    <path fill="#003087" d="M8.533 4.533h4.8c2.133 0 3.733.533 4.533 1.6.8 1.067.8 2.4 0 4-.8 1.6-2.4 2.4-4.533 2.4h-2.4l-.8 2.4h-1.6l2.4-7.2c.133-.4.4-.533.8-.533z"/>
-                    <path fill="#0070BA" d="M13.333 8.533h2.4c1.067 0 1.867-.267 2.267-.8.4-.533.4-1.2 0-2-.4-.8-1.2-1.2-2.267-1.2h-2.4l-1.2 3.6c0 .133.067.267.2.4z"/>
+                <div className="bg-white rounded p-2 flex items-center justify-center w-16 h-10 shadow-sm">
+                  <svg viewBox="0 0 48 32" className="w-10 h-6">
+                    <rect width="48" height="32" rx="4" fill="#003087"/>
+                    <path fill="#009CDE" d="M12 8h8c3 0 5 1 5 4s-2 4-5 4h-4l-1 4h-2l3-12z"/>
+                    <path fill="#012169" d="M16 12h4c1.5 0 2.5-.5 2.5-2s-1-2-2.5-2h-4l-2 8h2l2-4z"/>
+                    <path fill="#FFFFFF" d="M8 20h2l1-4h2c2 0 3-.5 3-2s-1-2-3-2h-4l-3 12h2z"/>
                   </svg>
                 </div>
 
                 {/* Apple Pay */}
-                <div className="bg-white rounded p-2 flex items-center justify-center w-12 h-8">
-                  <svg viewBox="0 0 40 24" className="w-8 h-5">
-                    <path fill="#000" d="M12.533 8.533c-.533 0-1.067-.267-1.333-.8-.267-.533-.133-1.2.267-1.6.4-.4.933-.667 1.467-.667.533 0 1.067.267 1.333.8.267.533.133 1.2-.267 1.6-.4.4-.933.667-1.467.667zm2.4 1.067c-.8 0-1.467.4-1.867.4s-1.067-.4-1.867-.4c-.933 0-1.8.533-2.267 1.333-1.067 1.867-.267 4.533.8 6 .533.733 1.133 1.533 1.933 1.533.8 0 1.067-.533 2-.533s1.2.533 2 .533c.8 0 1.4-.8 1.933-1.533.6-.867.8-1.733.8-1.8 0 0-1.533-.6-1.533-2.4 0-1.6 1.333-2.4 1.4-2.4-.8-1.133-2-1.267-2.4-1.267z"/>
+                <div className="bg-white rounded p-2 flex items-center justify-center w-16 h-10 shadow-sm">
+                  <svg viewBox="0 0 48 32" className="w-10 h-6">
+                    <rect width="48" height="32" rx="4" fill="#000000"/>
+                    <path fill="#FFFFFF" d="M18.5 12c-.8 0-1.5-.4-1.8-1-.3-.6-.2-1.3.3-1.8.5-.5 1.2-.8 1.9-.8.8 0 1.5.4 1.8 1 .3.6.2 1.3-.3 1.8-.5.5-1.2.8-1.9.8zm3 1.3c-1 0-1.8.5-2.3.5s-1.3-.5-2.3-.5c-1.2 0-2.3.7-2.9 1.7-1.3 2.4-.3 5.8 1 7.7.7.9 1.4 2 2.4 2 1 0 1.3-.7 2.5-.7s1.5.7 2.5.7c1 0 1.7-1 2.4-2 .8-1.1 1-2.2 1-2.3 0 0-1.9-.8-1.9-3.1 0-2 1.7-3.1 1.8-3.1-1-1.4-2.5-1.6-3-1.6z"/>
                   </svg>
                 </div>
 
                 {/* Google Pay */}
-                <div className="bg-white rounded p-2 flex items-center justify-center w-12 h-8">
-                  <svg viewBox="0 0 40 24" className="w-8 h-5">
-                    <path fill="#4285F4" d="M19.533 12c0-.8-.067-1.533-.2-2.267h-7.2v4.267h4.133c-.2 1.067-.8 2-1.667 2.6v2.133h2.667c1.533-1.4 2.4-3.533 2.4-6.733z"/>
-                    <path fill="#34A853" d="M12.133 20c2.267 0 4.133-.733 5.533-2l-2.667-2.133c-.733.533-1.733.8-2.867.8-2.2 0-4.067-1.467-4.733-3.467h-2.733v2.2c1.4 2.8 4.267 4.6 7.467 4.6z"/>
-                    <path fill="#FBBC04" d="M7.4 13.2c-.2-.533-.267-1.133-.267-1.733s.067-1.2.267-1.733v-2.2h-2.733c-.6 1.2-.933 2.533-.933 3.933s.333 2.733.933 3.933l2.733-2.2z"/>
-                    <path fill="#EA4335" d="M12.133 6.533c1.267 0 2.4.433 3.267 1.267l2.4-2.4c-1.467-1.333-3.333-2.133-5.667-2.133-3.2 0-6.067 1.8-7.467 4.6l2.733 2.2c.667-2 2.533-3.533 4.733-3.533z"/>
+                <div className="bg-white rounded p-2 flex items-center justify-center w-16 h-10 shadow-sm">
+                  <svg viewBox="0 0 48 32" className="w-10 h-6">
+                    <rect width="48" height="32" rx="4" fill="#FFFFFF"/>
+                    <path fill="#4285F4" d="M24 14c0-1-.1-2-.3-3h-9v5h5.2c-.2 1.3-1 2.5-2.1 3.3v2.7h3.4c2-1.8 3.1-4.5 3.1-8.5l-.3.5z"/>
+                    <path fill="#34A853" d="M15 25c2.9 0 5.3-.9 7.1-2.5l-3.4-2.7c-.9.7-2.2 1-3.7 1-2.8 0-5.2-1.9-6-4.4h-3.5v2.8c1.8 3.6 5.5 5.9 9.5 5.9v-.1z"/>
+                    <path fill="#FBBC04" d="M9 16.6c-.3-.7-.3-1.4-.3-2.2s.1-1.5.3-2.2v-2.8h-3.5c-.8 1.5-1.2 3.2-1.2 5s.4 3.5 1.2 5l3.5-2.8z"/>
+                    <path fill="#EA4335" d="M15 8.2c1.6 0 3.1.6 4.2 1.6l3.1-3.1c-1.9-1.7-4.3-2.7-7.3-2.7-4 0-7.7 2.3-9.5 5.9l3.5 2.8c.8-2.5 3.2-4.4 6-4.4v-.1z"/>
                   </svg>
                 </div>
 
                 {/* American Express */}
-                <div className="bg-white rounded p-2 flex items-center justify-center w-12 h-8">
-                  <svg viewBox="0 0 40 24" className="w-8 h-5">
-                    <rect fill="#006FCF" width="40" height="24" rx="2"/>
-                    <path fill="#FFF" d="M8.533 8.533h2.4l.533 1.333.533-1.333h2.4v4.8h-1.6v-2.933l-.667 1.6h-.8l-.667-1.6v2.933h-1.6v-4.8zm8 0h4v1.067h-2.4v.533h2.267v1.067h-2.267v.533h2.4v1.067h-4v-4.267zm5.333 0h1.733l1.067 2.133 1.067-2.133h1.733l-2.133 4.267h-1.333l-2.133-4.267z"/>
+                <div className="bg-white rounded p-2 flex items-center justify-center w-16 h-10 shadow-sm">
+                  <svg viewBox="0 0 48 32" className="w-10 h-6">
+                    <rect width="48" height="32" rx="4" fill="#006FCF"/>
+                    <path fill="#FFFFFF" d="M10 11h3l.7 1.7.7-1.7h3v6h-2v-3.7l-.8 2h-1l-.8-2v3.7h-2v-6zm10 0h5v1.3h-3v.7h2.8v1.3h-2.8v.7h3v1.3h-5v-5.3zm6.7 0h2.2l1.3 2.7 1.3-2.7h2.2l-2.7 5.3h-1.7l-2.6-5.3z"/>
                   </svg>
                 </div>
               </div>
