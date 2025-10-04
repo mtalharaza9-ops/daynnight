@@ -1,6 +1,86 @@
 import { sql } from '@vercel/postgres';
 import bcrypt from 'bcryptjs';
 
+// Check if Postgres is properly configured
+function checkPostgresConnection() {
+  const postgresUrl = process.env.POSTGRES_URL;
+  return postgresUrl && !postgresUrl.includes('username') && !postgresUrl.includes('password');
+}
+
+// Initialize memory data for development
+function initializeMemoryData() {
+  memoryProducts = [
+    {
+      id: 1,
+      name: 'Wireless Headphones',
+      description: 'High-quality wireless headphones with noise cancellation',
+      price: 199.99,
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
+      category: 'Electronics',
+      rating: 4.5,
+      reviews: 128,
+      inStock: true
+    },
+    {
+      id: 2,
+      name: 'Smart Watch',
+      description: 'Feature-rich smartwatch with health monitoring',
+      price: 299.99,
+      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',
+      category: 'Electronics',
+      rating: 4.3,
+      reviews: 89,
+      inStock: true
+    },
+    {
+      id: 3,
+      name: 'Laptop Backpack',
+      description: 'Durable laptop backpack with multiple compartments',
+      price: 79.99,
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400',
+      category: 'Accessories',
+      rating: 4.7,
+      reviews: 156,
+      inStock: true
+    }
+  ];
+
+  memoryCategories = [
+    {
+      id: 1,
+      name: 'Electronics',
+      description: 'Latest gadgets and electronic devices',
+      image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400'
+    },
+    {
+      id: 2,
+      name: 'Accessories',
+      description: 'Essential accessories for daily use',
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400'
+    },
+    {
+      id: 3,
+      name: 'Home & Garden',
+      description: 'Everything for your home and garden',
+      image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400'
+    }
+  ];
+}
+
+// For development, we'll use a simple in-memory fallback when Postgres is not available
+let isPostgresAvailable = checkPostgresConnection();
+
+// Simple in-memory storage for development
+let memoryProducts: Product[] = [];
+let memoryCategories: Category[] = [];
+let memoryUsers: User[] = [];
+let memoryCartItems: CartItem[] = [];
+
+// Initialize memory data immediately if Postgres is not available
+if (!isPostgresAvailable) {
+  initializeMemoryData();
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -47,6 +127,14 @@ export interface Order {
 
 // Initialize database tables
 export async function initializeDatabase() {
+  // Check if Postgres is properly configured
+  if (!isPostgresAvailable) {
+    console.log('Postgres not configured, using in-memory storage for development');
+    // Initialize with sample data
+    initializeMemoryData();
+    return { success: true };
+  }
+
   try {
     // Create products table
     await sql`
@@ -236,6 +324,10 @@ export async function seedDatabase() {
 
 // Get all products
 export async function getProducts() {
+  if (!isPostgresAvailable) {
+    return { success: true, data: memoryProducts };
+  }
+
   try {
     const { rows } = await sql`
       SELECT * FROM products 
@@ -250,6 +342,10 @@ export async function getProducts() {
 
 // Get all categories
 export async function getCategories() {
+  if (!isPostgresAvailable) {
+    return { success: true, data: memoryCategories };
+  }
+
   try {
     const { rows } = await sql`
       SELECT * FROM categories 
@@ -296,6 +392,33 @@ export async function searchProducts(query: string) {
 
 // User authentication functions
 export async function createUser(email: string, name: string, password: string) {
+  // Check if Postgres is available
+  if (!isPostgresAvailable) {
+    // Use in-memory storage for development
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Check if user already exists
+    const existingUser = memoryUsers.find(user => user.email === email);
+    if (existingUser) {
+      return { success: false, error: 'User already exists' };
+    }
+    
+    const newUser = {
+      id: memoryUsers.length + 1,
+      email,
+      name,
+      password: hashedPassword,
+      role: 'user' as const,
+      createdAt: new Date()
+    };
+    
+    memoryUsers.push(newUser);
+    
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = newUser;
+    return { success: true, data: userWithoutPassword };
+  }
+
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const { rows } = await sql`

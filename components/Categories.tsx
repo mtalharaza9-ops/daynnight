@@ -29,7 +29,9 @@ export default function Categories() {
       if (data.success) {
         setCategories(data.data || []);
       } else {
-        setError('Failed to load categories');
+        // Handle error response properly - extract string message
+        const errorMessage = typeof data.error === 'string' ? data.error : 'Failed to load categories';
+        setError(errorMessage);
       }
     } catch (err) {
       setError('Error loading categories');

@@ -50,7 +50,9 @@ export default function Products({ category, searchQuery }: ProductsProps) {
       if (data.success) {
         setProducts(data.data || []);
       } else {
-        setError('Failed to load products');
+        // Handle error response properly - extract string message
+        const errorMessage = typeof data.error === 'string' ? data.error : 'Failed to load products';
+        setError(errorMessage);
       }
     } catch (err) {
       setError('Error loading products');
