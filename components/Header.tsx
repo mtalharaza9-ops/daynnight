@@ -31,7 +31,7 @@ export default function Header() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <img src="/logo.svg" alt="Day & Night Logo" className="h-10 w-10" />
+              <img src="/logo.png" alt="Day & Night Logo" className="h-10 w-10" />
               <span className="text-2xl font-bold text-gray-900">Day & Night</span>
             </Link>
           </div>
