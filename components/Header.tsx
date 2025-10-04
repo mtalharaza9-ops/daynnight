@@ -30,8 +30,9 @@ export default function Header() {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              Day & Night
+            <Link href="/" className="flex items-center space-x-2">
+              <img src="/logo.svg" alt="Day & Night Logo" className="h-10 w-10" />
+              <span className="text-2xl font-bold text-gray-900">Day & Night</span>
             </Link>
           </div>
 

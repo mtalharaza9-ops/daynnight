@@ -1,0 +1,27 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="50" fill="#f4f4f4"/>
+  
+  <!-- Sun half (left side) -->
+  <path d="M 50 0 A 50 50 0 0 1 50 100 Z" fill="#F4D03F"/>
+  
+  <!-- Sun rays -->
+  <g fill="white">
+    <polygon points="35,15 40,25 30,25"/>
+    <polygon points="25,20 35,25 25,30"/>
+    <polygon points="20,35 30,40 20,45"/>
+    <polygon points="15,50 25,50 15,55"/>
+    <polygon points="20,65 30,60 20,70"/>
+    <polygon points="25,80 35,75 25,85"/>
+    <polygon points="35,85 40,75 30,75"/>
+  </g>
+  
+  <!-- Sun center -->
+  <circle cx="35" cy="50" r="15" fill="#F7DC6F"/>
+  
+  <!-- Moon half (right side) -->
+  <path d="M 50 0 A 50 50 0 0 0 50 100 Z" fill="#1B4F72"/>
+  
+  <!-- Moon crescent -->
+  <path d="M 65 20 A 25 25 0 0 1 65 80 A 20 20 0 0 0 65 20 Z" fill="#D5DBDB"/>
+</svg>
