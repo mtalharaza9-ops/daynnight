@@ -20,8 +20,9 @@ export default function SignIn() {
     setError('');
 
     try {
-      console.log('Starting sign-in process...');
-      console.log('Callback URL:', callbackUrl);
+      console.log('🔄 Starting sign-in process...');
+      console.log('📍 Callback URL:', callbackUrl);
+      console.log('📧 Email:', email);
       
       const result = await signIn('credentials', {
         email,
@@ -29,42 +30,54 @@ export default function SignIn() {
         redirect: false,
       });
 
-      console.log('SignIn result:', result);
+      console.log('✅ SignIn result:', result);
 
       if (result?.error) {
-        console.log('SignIn error:', result.error);
+        console.log('❌ SignIn error:', result.error);
         setError('Invalid email or password');
-      } else if (result?.ok) {
-        console.log('SignIn successful, checking session...');
+        setLoading(false);
+        return;
+      } 
+
+      if (result?.ok) {
+        console.log('🎉 SignIn successful! Checking session...');
         
         // Wait for session to be established
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
         const session = await getSession();
-        console.log('Session after login:', session);
+        console.log('👤 Session after login:', session);
+        
+        if (!session) {
+          console.log('⚠️ No session found after login');
+          setError('Session could not be established. Please try again.');
+          setLoading(false);
+          return;
+        }
         
         if (session?.user?.role === 'admin') {
-          console.log('Admin user detected, redirecting to admin dashboard');
-          if (callbackUrl.startsWith('/admin')) {
-            console.log('Redirecting to specific admin page:', callbackUrl);
-            window.location.href = callbackUrl;
-          } else {
-            console.log('Redirecting to admin dashboard');
-            window.location.href = '/admin';
-          }
+          console.log('👑 Admin user detected! Role:', session.user.role);
+          const redirectUrl = callbackUrl.startsWith('/admin') ? callbackUrl : '/admin';
+          console.log('🚀 Redirecting to:', redirectUrl);
+          
+          // Force a hard redirect
+          window.location.replace(redirectUrl);
         } else {
-          console.log('Regular user detected, role:', session?.user?.role);
+          console.log('👤 Regular user detected, role:', session?.user?.role);
           if (callbackUrl.startsWith('/admin')) {
-            console.log('Preventing admin access, redirecting to home');
-            window.location.href = '/';
+            console.log('🚫 Preventing admin access, redirecting to home');
+            window.location.replace('/');
           } else {
-            console.log('Redirecting to callback URL:', callbackUrl);
-            window.location.href = callbackUrl;
+            console.log('🏠 Redirecting to callback URL:', callbackUrl);
+            window.location.replace(callbackUrl);
           }
         }
+      } else {
+        console.log('⚠️ Unexpected result:', result);
+        setError('Login failed. Please try again.');
       }
     } catch (error) {
-      console.error('SignIn error:', error);
+      console.error('💥 SignIn error:', error);
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
