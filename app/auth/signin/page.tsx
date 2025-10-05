@@ -1,18 +1,57 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { signIn, getSession } from 'next-auth/react';
+import { signIn, getSession, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
+
+  // Redirect authenticated users away from sign-in page
+  useEffect(() => {
+    if (status === 'authenticated' && session) {
+      console.log('🔄 User already authenticated, redirecting...');
+      if (session.user?.role === 'admin' && callbackUrl.startsWith('/admin')) {
+        router.replace(callbackUrl);
+      } else if (session.user?.role === 'admin') {
+        router.replace('/admin');
+      } else {
+        router.replace(callbackUrl === '/auth/signin' ? '/' : callbackUrl);
+      }
+    }
+  }, [session, status, callbackUrl, router]);
+
+  // Show loading while checking authentication status
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render the form if user is already authenticated
+  if (status === 'authenticated') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,65 +60,19 @@ export default function SignIn() {
 
     try {
       console.log('🔄 Starting sign-in process...');
-      console.log('📍 Callback URL:', callbackUrl);
-      console.log('📧 Email:', email);
       
       const result = await signIn('credentials', {
         email,
         password,
-        redirect: false,
+        callbackUrl,
+        redirect: true, // Let NextAuth handle the redirect
       });
 
+      // This code will only run if redirect: false
       console.log('✅ SignIn result:', result);
-
-      if (result?.error) {
-        console.log('❌ SignIn error:', result.error);
-        setError('Invalid email or password');
-        setLoading(false);
-        return;
-      } 
-
-      if (result?.ok) {
-        console.log('🎉 SignIn successful! Checking session...');
-        
-        // Wait for session to be established
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        const session = await getSession();
-        console.log('👤 Session after login:', session);
-        
-        if (!session) {
-          console.log('⚠️ No session found after login');
-          setError('Session could not be established. Please try again.');
-          setLoading(false);
-          return;
-        }
-        
-        if (session?.user?.role === 'admin') {
-          console.log('👑 Admin user detected! Role:', session.user.role);
-          const redirectUrl = callbackUrl.startsWith('/admin') ? callbackUrl : '/admin';
-          console.log('🚀 Redirecting to:', redirectUrl);
-          
-          // Force a hard redirect
-          window.location.replace(redirectUrl);
-        } else {
-          console.log('👤 Regular user detected, role:', session?.user?.role);
-          if (callbackUrl.startsWith('/admin')) {
-            console.log('🚫 Preventing admin access, redirecting to home');
-            window.location.replace('/');
-          } else {
-            console.log('🏠 Redirecting to callback URL:', callbackUrl);
-            window.location.replace(callbackUrl);
-          }
-        }
-      } else {
-        console.log('⚠️ Unexpected result:', result);
-        setError('Login failed. Please try again.');
-      }
     } catch (error) {
       console.error('💥 SignIn error:', error);
       setError('An error occurred. Please try again.');
-    } finally {
       setLoading(false);
     }
   };

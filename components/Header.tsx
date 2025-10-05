@@ -76,18 +76,18 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             {session ? (
               <div className="flex items-center space-x-4">
-                <span className="text-gray-700">Hello, {session.user.name}</span>
-                {session.user.role === 'admin' && (
+                <span className="text-gray-700">Hello, {session.user?.email}</span>
+                {session.user?.role === 'admin' && (
                   <Link
                     href="/admin"
-                    className="text-indigo-600 hover:text-indigo-800 font-medium"
+                    className="bg-indigo-600 text-white px-3 py-1 rounded-md hover:bg-indigo-700 font-medium"
                   >
-                    Admin
+                    Admin Panel
                   </Link>
                 )}
                 <button
-                  onClick={() => signOut()}
-                  className="text-gray-700 hover:text-gray-900"
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="text-gray-700 hover:text-gray-900 border border-gray-300 px-3 py-1 rounded-md hover:bg-gray-50"
                 >
                   Sign Out
                 </button>

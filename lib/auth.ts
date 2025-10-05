@@ -54,9 +54,13 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
+      console.log('🔄 NextAuth redirect callback:', { url, baseUrl });
+      
       // Handle callback URLs properly
       if (url.startsWith("/")) {
-        return `${baseUrl}${url}`;
+        const fullUrl = `${baseUrl}${url}`;
+        console.log('📍 Relative URL redirect:', fullUrl);
+        return fullUrl;
       }
       
       // If it's a callback URL, extract the actual destination
@@ -65,6 +69,8 @@ export const authOptions: NextAuthOptions = {
         const callbackUrl = urlObj.searchParams.get('callbackUrl');
         if (callbackUrl) {
           const decodedCallback = decodeURIComponent(callbackUrl);
+          console.log('📍 Decoded callback URL:', decodedCallback);
+          
           if (decodedCallback.startsWith(baseUrl)) {
             return decodedCallback;
           }
@@ -73,9 +79,11 @@ export const authOptions: NextAuthOptions = {
       
       // Allow same origin URLs
       if (new URL(url).origin === baseUrl) {
+        console.log('✅ Same origin URL allowed:', url);
         return url;
       }
       
+      console.log('🏠 Default redirect to base URL');
       return baseUrl;
     },
   },
