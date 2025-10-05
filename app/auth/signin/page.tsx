@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn, getSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 export default function SignIn() {
@@ -11,6 +11,8 @@ export default function SignIn() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,23 +20,51 @@ export default function SignIn() {
     setError('');
 
     try {
+      console.log('Starting sign-in process...');
+      console.log('Callback URL:', callbackUrl);
+      
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
       });
 
+      console.log('SignIn result:', result);
+
       if (result?.error) {
+        console.log('SignIn error:', result.error);
         setError('Invalid email or password');
-      } else {
+      } else if (result?.ok) {
+        console.log('SignIn successful, checking session...');
+        
+        // Wait for session to be established
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const session = await getSession();
+        console.log('Session after login:', session);
+        
         if (session?.user?.role === 'admin') {
-          router.push('/admin');
+          console.log('Admin user detected, redirecting to admin dashboard');
+          if (callbackUrl.startsWith('/admin')) {
+            console.log('Redirecting to specific admin page:', callbackUrl);
+            window.location.href = callbackUrl;
+          } else {
+            console.log('Redirecting to admin dashboard');
+            window.location.href = '/admin';
+          }
         } else {
-          router.push('/');
+          console.log('Regular user detected, role:', session?.user?.role);
+          if (callbackUrl.startsWith('/admin')) {
+            console.log('Preventing admin access, redirecting to home');
+            window.location.href = '/';
+          } else {
+            console.log('Redirecting to callback URL:', callbackUrl);
+            window.location.href = callbackUrl;
+          }
         }
       }
     } catch (error) {
+      console.error('SignIn error:', error);
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);

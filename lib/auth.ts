@@ -53,6 +53,31 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // Handle callback URLs properly
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
+      }
+      
+      // If it's a callback URL, extract the actual destination
+      if (url.includes('callbackUrl=')) {
+        const urlObj = new URL(url);
+        const callbackUrl = urlObj.searchParams.get('callbackUrl');
+        if (callbackUrl) {
+          const decodedCallback = decodeURIComponent(callbackUrl);
+          if (decodedCallback.startsWith(baseUrl)) {
+            return decodedCallback;
+          }
+        }
+      }
+      
+      // Allow same origin URLs
+      if (new URL(url).origin === baseUrl) {
+        return url;
+      }
+      
+      return baseUrl;
+    },
   },
   pages: {
     signIn: '/auth/signin',

@@ -4,7 +4,6 @@ import Products from '@/components/Products';
 import BestSellers from '@/components/BestSellers';
 import FlashDeals from '@/components/FlashDeals';
 import WhyShopWithUs from '@/components/WhyShopWithUs';
-import CustomerReviews from '@/components/CustomerReviews';
 import Newsletter from '@/components/Newsletter';
 
 export default function Home() {
@@ -16,7 +15,6 @@ export default function Home() {
       <FlashDeals />
       <Products />
       <WhyShopWithUs />
-      <CustomerReviews />
       <Newsletter />
     </main>
   );

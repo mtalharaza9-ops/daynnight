@@ -89,9 +89,30 @@ let memoryCategories: Category[] = [];
 let memoryUsers: User[] = [];
 let memoryCartItems: CartItem[] = [];
 
+// Track initialization status
+let memoryInitialized = false;
+let initializationPromise: Promise<void> | null = null;
+
 // Initialize memory data immediately if Postgres is not available
 if (!isPostgresAvailable) {
-  initializeMemoryData().catch(console.error);
+  initializationPromise = initializeMemoryData().then(() => {
+    memoryInitialized = true;
+    console.log('In-memory database initialized successfully');
+  }).catch(error => {
+    console.error('Failed to initialize in-memory database:', error);
+  });
+}
+
+// Ensure initialization is complete before any database operations
+async function ensureMemoryInitialized() {
+  if (!isPostgresAvailable && !memoryInitialized) {
+    if (initializationPromise) {
+      await initializationPromise;
+    } else {
+      await initializeMemoryData();
+      memoryInitialized = true;
+    }
+  }
 }
 
 export interface Product {
@@ -338,6 +359,7 @@ export async function seedDatabase() {
 // Get all products
 export async function getProducts() {
   if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
     return { success: true, data: memoryProducts };
   }
 
@@ -346,7 +368,15 @@ export async function getProducts() {
       SELECT * FROM products 
       ORDER BY created_at DESC
     `;
-    return { success: true, data: rows };
+    
+    // Convert price from string to number (PostgreSQL DECIMAL returns as string)
+    const products = rows.map(row => ({
+      ...row,
+      price: parseFloat(row.price),
+      rating: parseFloat(row.rating)
+    }));
+    
+    return { success: true, data: products };
   } catch (error) {
     console.error('Error fetching products:', error);
     return { success: false, error };
@@ -356,6 +386,7 @@ export async function getProducts() {
 // Get all categories
 export async function getCategories() {
   if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
     return { success: true, data: memoryCategories };
   }
 
@@ -373,13 +404,26 @@ export async function getCategories() {
 
 // Get products by category
 export async function getProductsByCategory(category: string) {
+  if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
+    return { success: true, data: memoryProducts.filter(p => p.category.toLowerCase() === category.toLowerCase()) };
+  }
+
   try {
     const { rows } = await sql`
       SELECT * FROM products 
-      WHERE category = ${category}
+      WHERE LOWER(category) = LOWER(${category})
       ORDER BY created_at DESC
     `;
-    return { success: true, data: rows };
+    
+    // Convert price from string to number (PostgreSQL DECIMAL returns as string)
+    const products = rows.map(row => ({
+      ...row,
+      price: parseFloat(row.price),
+      rating: parseFloat(row.rating)
+    }));
+    
+    return { success: true, data: products };
   } catch (error) {
     console.error('Error fetching products by category:', error);
     return { success: false, error };
@@ -388,6 +432,18 @@ export async function getProductsByCategory(category: string) {
 
 // Search products
 export async function searchProducts(query: string) {
+  if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
+    return { 
+      success: true, 
+      data: memoryProducts.filter(p => 
+        p.name.toLowerCase().includes(query.toLowerCase()) ||
+        p.description.toLowerCase().includes(query.toLowerCase()) ||
+        p.category.toLowerCase().includes(query.toLowerCase())
+      ) 
+    };
+  }
+
   try {
     const { rows } = await sql`
       SELECT * FROM products 
@@ -396,7 +452,15 @@ export async function searchProducts(query: string) {
          OR category ILIKE ${`%${query}%`}
       ORDER BY created_at DESC
     `;
-    return { success: true, data: rows };
+    
+    // Convert price from string to number (PostgreSQL DECIMAL returns as string)
+    const products = rows.map(row => ({
+      ...row,
+      price: parseFloat(row.price),
+      rating: parseFloat(row.rating)
+    }));
+    
+    return { success: true, data: products };
   } catch (error) {
     console.error('Error searching products:', error);
     return { success: false, error };
@@ -407,6 +471,7 @@ export async function searchProducts(query: string) {
 export async function createUser(email: string, name: string, password: string) {
   // Check if Postgres is available
   if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
     // Use in-memory storage for development
     const hashedPassword = await bcrypt.hash(password, 10);
     
@@ -447,6 +512,25 @@ export async function createUser(email: string, name: string, password: string) 
 }
 
 export async function getUserByEmail(email: string) {
+  if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
+    const user = memoryUsers.find(u => u.email === email);
+    if (user) {
+      return { 
+        success: true, 
+        data: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          password: user.password,
+          role: user.role,
+          created_at: user.createdAt
+        }
+      };
+    }
+    return { success: true, data: null };
+  }
+
   try {
     const { rows } = await sql`
       SELECT * FROM users WHERE email = ${email}
@@ -454,7 +538,9 @@ export async function getUserByEmail(email: string) {
     return { success: true, data: rows[0] || null };
   } catch (error) {
     console.error('Error fetching user by email, falling back to memory:', error);
+    
     // Fallback to in-memory storage
+    await ensureMemoryInitialized();
     const user = memoryUsers.find(u => u.email === email);
     if (user) {
       return { 
@@ -591,6 +677,182 @@ export async function deleteProduct(id: number) {
     return { success: true };
   } catch (error) {
     console.error('Error deleting product:', error);
+    return { success: false, error };
+  }
+}
+
+export async function updateUser(id: number, updates: Partial<User>) {
+  if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
+    // Memory fallback
+    const userIndex = memoryUsers.findIndex(user => user.id === id);
+    if (userIndex === -1) {
+      return { success: false, error: 'User not found' };
+    }
+    
+    memoryUsers[userIndex] = { ...memoryUsers[userIndex], ...updates };
+    return { success: true, data: memoryUsers[userIndex] };
+  }
+
+  try {
+    const { rows } = await sql`
+      UPDATE users 
+      SET name = COALESCE(${updates.name}, name),
+          email = COALESCE(${updates.email}, email),
+          role = COALESCE(${updates.role}, role)
+      WHERE id = ${id}
+      RETURNING id, email, name, role, created_at
+    `;
+    
+    if (rows.length === 0) {
+      return { success: false, error: 'User not found' };
+    }
+    
+    return { success: true, data: rows[0] };
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return { success: false, error };
+  }
+}
+
+export async function deleteUser(id: number) {
+  if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
+    // Memory fallback
+    const userIndex = memoryUsers.findIndex(user => user.id === id);
+    if (userIndex === -1) {
+      return { success: false, error: 'User not found' };
+    }
+    
+    memoryUsers.splice(userIndex, 1);
+    return { success: true };
+  }
+
+  try {
+    const { rowCount } = await sql`DELETE FROM users WHERE id = ${id}`;
+    
+    if (rowCount === 0) {
+      return { success: false, error: 'User not found' };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return { success: false, error };
+  }
+}
+
+// Order management functions
+let memoryOrders: Order[] = [];
+
+export async function getAllOrders() {
+  if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
+    // Memory fallback with sample orders
+    if (memoryOrders.length === 0) {
+      memoryOrders = [
+        {
+          id: 1,
+          userId: 1,
+          total: 299.99,
+          status: 'delivered',
+          createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
+        },
+        {
+          id: 2,
+          userId: 1,
+          total: 149.99,
+          status: 'shipped',
+          createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+        },
+        {
+          id: 3,
+          userId: 1,
+          total: 79.99,
+          status: 'processing',
+          createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+        },
+        {
+          id: 4,
+          userId: 1,
+          total: 199.99,
+          status: 'pending',
+          createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 hours ago
+        }
+      ];
+    }
+    return { success: true, data: memoryOrders };
+  }
+
+  try {
+    const { rows } = await sql`
+      SELECT o.*, u.name as user_name, u.email as user_email
+      FROM orders o
+      JOIN users u ON o.user_id = u.id
+      ORDER BY o.created_at DESC
+    `;
+    return { success: true, data: rows };
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    return { success: false, error };
+  }
+}
+
+export async function updateOrderStatus(id: number, status: Order['status']) {
+  if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
+    // Memory fallback
+    const orderIndex = memoryOrders.findIndex(order => order.id === id);
+    if (orderIndex === -1) {
+      return { success: false, error: 'Order not found' };
+    }
+    
+    memoryOrders[orderIndex].status = status;
+    return { success: true, data: memoryOrders[orderIndex] };
+  }
+
+  try {
+    const { rows } = await sql`
+      UPDATE orders 
+      SET status = ${status}
+      WHERE id = ${id}
+      RETURNING *
+    `;
+    
+    if (rows.length === 0) {
+      return { success: false, error: 'Order not found' };
+    }
+    
+    return { success: true, data: rows[0] };
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    return { success: false, error };
+  }
+}
+
+export async function deleteOrder(id: number) {
+  if (!isPostgresAvailable) {
+    await ensureMemoryInitialized();
+    // Memory fallback
+    const orderIndex = memoryOrders.findIndex(order => order.id === id);
+    if (orderIndex === -1) {
+      return { success: false, error: 'Order not found' };
+    }
+    
+    memoryOrders.splice(orderIndex, 1);
+    return { success: true };
+  }
+
+  try {
+    const { rowCount } = await sql`DELETE FROM orders WHERE id = ${id}`;
+    
+    if (rowCount === 0) {
+      return { success: false, error: 'Order not found' };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting order:', error);
     return { success: false, error };
   }
 }
