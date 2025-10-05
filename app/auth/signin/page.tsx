@@ -59,17 +59,30 @@ export default function SignIn() {
     setError('');
 
     try {
-      console.log('🔄 Starting sign-in process...');
+      console.log('🔄 Starting sign-in process with:', { email, callbackUrl });
       
       const result = await signIn('credentials', {
         email,
         password,
         callbackUrl,
-        redirect: true, // Let NextAuth handle the redirect
+        redirect: false, // Don't redirect automatically to see the result
       });
 
-      // This code will only run if redirect: false
       console.log('✅ SignIn result:', result);
+      
+      if (result?.error) {
+        console.error('❌ SignIn error:', result.error);
+        setError('Invalid credentials. Please try again.');
+        setLoading(false);
+      } else if (result?.ok) {
+        console.log('✅ SignIn successful, redirecting...');
+        // Manually redirect on success
+        window.location.href = callbackUrl || '/';
+      } else {
+        console.log('⚠️ Unexpected result:', result);
+        setError('An unexpected error occurred. Please try again.');
+        setLoading(false);
+      }
     } catch (error) {
       console.error('💥 SignIn error:', error);
       setError('An error occurred. Please try again.');

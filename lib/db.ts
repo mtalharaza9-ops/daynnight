@@ -2,13 +2,41 @@ import { sql } from '@vercel/postgres';
 import bcrypt from 'bcryptjs';
 
 // Check if Postgres is properly configured
-function checkPostgresConnection() {
-  const postgresUrl = process.env.POSTGRES_URL;
-  return postgresUrl && !postgresUrl.includes('username') && !postgresUrl.includes('password');
+export async function checkPostgresConnection(): Promise<boolean> {
+  try {
+    console.log('🔍 Checking Postgres connection...');
+    
+    // Check if we have a valid Postgres URL
+    const postgresUrl = process.env.POSTGRES_URL || 
+                       process.env.POSTGRES_DATABASE_URL || 
+                       process.env.POSTGRES_POSTGRES_URL;
+    
+    console.log('POSTGRES_URL exists:', !!postgresUrl);
+    
+    if (!postgresUrl || 
+        postgresUrl.includes('username:password@host:port') || 
+        postgresUrl === 'postgres://username:password@host:port/database') {
+      console.log('POSTGRES_URL is configured:', false);
+      return false;
+    }
+    
+    console.log('POSTGRES_URL is configured:', true);
+    
+    // Try to connect to Postgres
+    const { sql } = await import('@vercel/postgres');
+    await sql`SELECT 1`;
+    console.log('✅ Postgres connection successful');
+    return true;
+  } catch (error) {
+    console.log('❌ Postgres connection failed:', error instanceof Error ? error.message : 'Unknown error');
+    return false;
+  }
 }
 
 // Initialize memory data for development
 async function initializeMemoryData() {
+  console.log('🚀 Initializing in-memory database...');
+  
   memoryProducts = [
     {
       id: 1,
@@ -66,22 +94,32 @@ async function initializeMemoryData() {
     }
   ];
 
-  // Create default admin user for development
-  const adminPassword = await bcrypt.hash('admin123', 10);
+  // Create new admin user
+  const adminPassword = await bcrypt.hash('admin@100', 10);
   memoryUsers = [
     {
       id: 1,
-      email: 'admin@daynnight.com',
+      email: 'admin@admin.com',
       name: 'Admin User',
       password: adminPassword,
       role: 'admin',
       createdAt: new Date()
+    },
+    {
+      id: 2,
+      email: 'user@example.com',
+      name: 'Regular User',
+      password: await bcrypt.hash('user123', 10),
+      role: 'user',
+      createdAt: new Date()
     }
   ];
+  
+  console.log('✅ In-memory database initialized with admin user: admin@admin.com');
 }
 
 // For development, we'll use a simple in-memory fallback when Postgres is not available
-let isPostgresAvailable = checkPostgresConnection();
+let isPostgresAvailable: Promise<boolean> = checkPostgresConnection();
 
 // Simple in-memory storage for development
 let memoryProducts: Product[] = [];
@@ -93,15 +131,18 @@ let memoryCartItems: CartItem[] = [];
 let memoryInitialized = false;
 let initializationPromise: Promise<void> | null = null;
 
-// Initialize memory data immediately if Postgres is not available
-if (!isPostgresAvailable) {
-  initializationPromise = initializeMemoryData().then(() => {
-    memoryInitialized = true;
-    console.log('In-memory database initialized successfully');
-  }).catch(error => {
-    console.error('Failed to initialize in-memory database:', error);
-  });
-}
+// Initialize memory data if Postgres is not available
+(async () => {
+  if (!(await isPostgresAvailable)) {
+    console.log('🚀 Initializing in-memory database...');
+    initializationPromise = initializeMemoryData().then(() => {
+      memoryInitialized = true;
+      console.log('In-memory database initialized successfully');
+    }).catch(error => {
+      console.error('Failed to initialize in-memory database:', error);
+    });
+  }
+})();
 
 // Ensure initialization is complete before any database operations
 async function ensureMemoryInitialized() {
@@ -162,10 +203,10 @@ export interface Order {
 // Initialize database tables
 export async function initializeDatabase() {
   // Check if Postgres is properly configured
-  if (!isPostgresAvailable) {
+  if (!(await isPostgresAvailable)) {
     console.log('Postgres not configured, using in-memory storage for development');
     // Initialize with sample data
-    initializeMemoryData();
+    await initializeMemoryData();
     return { success: true };
   }
 
@@ -340,11 +381,14 @@ export async function seedDatabase() {
       `;
     }
 
-    // Create default admin user
-    const adminPassword = await bcrypt.hash('admin123', 10);
+    // Delete all existing admin users first
+    await sql`DELETE FROM users WHERE role = 'admin'`;
+
+    // Create new admin user
+    const adminPassword = await bcrypt.hash('admin@100', 10);
     await sql`
       INSERT INTO users (email, name, password, role)
-      VALUES ('admin@daynnight.com', 'Admin User', ${adminPassword}, 'admin')
+      VALUES ('admin@admin.com', 'Admin User', ${adminPassword}, 'admin')
       ON CONFLICT (email) DO NOTHING
     `;
 
@@ -512,7 +556,9 @@ export async function createUser(email: string, name: string, password: string) 
 }
 
 export async function getUserByEmail(email: string) {
-  if (!isPostgresAvailable) {
+  const postgresAvailable = await isPostgresAvailable;
+  
+  if (!postgresAvailable) {
     await ensureMemoryInitialized();
     const user = memoryUsers.find(u => u.email === email);
     if (user) {

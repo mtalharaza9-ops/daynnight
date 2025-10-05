@@ -2,42 +2,74 @@ import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { getUserByEmail, verifyPassword } from './db';
 
+console.log('🔧 Loading NextAuth configuration...');
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: 'credentials',
+      id: 'credentials',
+      name: 'Credentials',
+      type: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' }
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-
-        const userResult = await getUserByEmail(credentials.email);
-        if (!userResult.success || !userResult.data) {
-          return null;
-        }
-
-        const user = userResult.data;
-        const isValidPassword = await verifyPassword(credentials.password, user.password);
+      async authorize(credentials, req) {
+        console.log('🔍 NextAuth authorize called with:', { 
+          email: credentials?.email,
+          hasPassword: !!credentials?.password,
+          req: !!req
+        });
         
-        if (!isValidPassword) {
-          return null;
+        if (!credentials?.email || !credentials?.password) {
+          console.log('❌ Missing credentials');
+          throw new Error('Missing credentials');
         }
 
-        return {
-          id: user.id.toString(),
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
+        try {
+          console.log('🔍 Looking up user by email:', credentials.email);
+          const userResult = await getUserByEmail(credentials.email);
+          console.log('🔍 User lookup result:', userResult);
+          
+          if (!userResult.success || !userResult.data) {
+            console.log('❌ User not found');
+            throw new Error('Invalid credentials');
+          }
+
+          const user = userResult.data;
+          console.log('✅ Found user:', { id: user.id, email: user.email, role: user.role });
+          
+          console.log('🔍 Verifying password...');
+          const isValidPassword = await verifyPassword(credentials.password, user.password);
+          console.log('🔍 Password validation result:', isValidPassword);
+          
+          if (!isValidPassword) {
+            console.log('❌ Invalid password');
+            throw new Error('Invalid credentials');
+          }
+
+          const authUser = {
+            id: user.id.toString(),
+            email: user.email,
+            name: user.name || user.email,
+            role: user.role,
+          };
+          
+          console.log('✅ Returning authenticated user:', authUser);
+          return authUser;
+        } catch (error) {
+          console.error('💥 Error in authorize function:', error);
+          throw error;
+        }
       }
     })
   ],
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -83,7 +115,8 @@ export const authOptions: NextAuthOptions = {
         return url;
       }
       
-      console.log('🏠 Default redirect to base URL');
+      // Default to base URL
+      console.log('🏠 Defaulting to base URL:', baseUrl);
       return baseUrl;
     },
   },
@@ -91,4 +124,5 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
 };
