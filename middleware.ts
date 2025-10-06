@@ -1,4 +1,5 @@
 import { withAuth } from 'next-auth/middleware';
+import { NextResponse } from 'next/server';
 
 export default withAuth(
   function middleware(req) {
@@ -11,6 +12,11 @@ export default withAuth(
     callbacks: {
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
+        
+        // Always allow NextAuth API routes
+        if (pathname.startsWith('/api/auth/')) {
+          return true;
+        }
         
         // Protect admin routes
         if (pathname.startsWith('/admin')) {
